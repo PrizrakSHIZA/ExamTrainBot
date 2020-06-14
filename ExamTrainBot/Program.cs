@@ -31,7 +31,7 @@ namespace ExamTrainBot
             AddAllTests();
 
             //Initialize bot client
-            bot = new TelegramBotClient("1199179292:AAFbq7wVYc1lYY6PGhopa4sIW4zdH0Y-C9g") { Timeout = TimeSpan.FromSeconds(10) };
+            bot = new TelegramBotClient(APIKeys.TestBotApi) { Timeout = TimeSpan.FromSeconds(10) };
 
             //Starting message
             var me = bot.GetMeAsync().Result;

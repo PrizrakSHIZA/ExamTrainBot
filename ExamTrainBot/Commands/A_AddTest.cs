@@ -15,7 +15,7 @@ namespace ExamTrainBot.Commands
 
         public override bool forAdmin => true;
 
-        public Test test = new Test("1", new List<Question>());
+        public Test test = new Test("", new List<Question>());
         public string callback, text, answer;
         public int points, columns, stage = 0;
         public string[] variants;

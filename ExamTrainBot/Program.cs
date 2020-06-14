@@ -80,7 +80,7 @@ namespace ExamTrainBot
             //if admin creating test
             else if (user.testcreation)
             {
-                A_AddTest cmd = (A_AddTest)commands.Find(c => c.GetType().Equals(typeof(A_AddTest)));
+                A_TestAdd cmd = (A_TestAdd)commands.Find(c => c.GetType().Equals(typeof(A_TestAdd)));
                 cmd.Execute(e.CallbackQuery.Data);
             }
         }
@@ -102,7 +102,7 @@ namespace ExamTrainBot
             //if admin creating test
             if (user.testcreation)
             {
-                commands.Find(c => c.GetType().Equals(typeof(A_AddTest))).Execute(e);
+                commands.Find(c => c.GetType().Equals(typeof(A_TestAdd))).Execute(e);
             }
             //If user completing test
             else if (user.ontest)
@@ -206,12 +206,15 @@ namespace ExamTrainBot
 
         private static void AddAllCommands()
         {
-            commands.Add(new TestCommand());
+            commands.Add(new A_TestAdd());
+            commands.Add(new A_TestDelete());
+            commands.Add(new A_TestList());
+            commands.Add(new A_UserAdd());
+            commands.Add(new A_UserDelete());
+            commands.Add(new A_UserList());
             commands.Add(new AdminCommand());
-            commands.Add(new A_Adduser());
             commands.Add(new HelpCommand());
-            commands.Add(new A_Userlist());
-            commands.Add(new A_AddTest());
+            commands.Add(new TestCommand());
             commands.Sort((x, y) => string.Compare(x.Name, y.Name));
         }
 

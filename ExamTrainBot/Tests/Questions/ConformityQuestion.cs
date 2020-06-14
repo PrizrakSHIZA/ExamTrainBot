@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Args;
@@ -36,13 +37,19 @@ namespace ExamTrainBot.Tests.Questions
         public bool IsRight(string answer)
         {
             answer = answer.Replace("-", "").ToLower();
-            string[] answerarr = answer.Split(delimiterChars);
+            List<string> answerarr = answer.Split(delimiterChars).ToList();
+            for (int i = 0; i < answerarr.Count; i++)
+            {
+                if (answerarr[i] == "")
+                    answerarr.Remove(answerarr[i]);
+            }
+            Console.WriteLine(answerarr.Count);
             string[] rightnaswer = this.answer.Replace("-", "").ToLower().Split(delimiterChars);
-            if (rightnaswer.Length != answerarr.Length)
+            if (rightnaswer.Length != answerarr.Count)
                 return false;
             for (int i = 0; i < rightnaswer.Length; i++)
             {
-                for (int y = 0; y < answerarr.Length; y++)
+                for (int y = 0; y < answerarr.Count; y++)
                 {
                     if (answerarr[i].Contains(rightnaswer[y].ToCharArray()[0]))
                         if (!answerarr[i].Contains(rightnaswer[y].ToCharArray()[1]))

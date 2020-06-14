@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Encodings.Web;
 using Telegram.Bot.Args;
@@ -7,7 +8,7 @@ using Telegram.Bot.Types.Enums;
 
 namespace ExamTrainBot.Commands
 {
-    class A_Userlist : Command
+    class A_UserList : Command
     {
         public override string Name => "/userlist";
 
@@ -16,7 +17,7 @@ namespace ExamTrainBot.Commands
         public async override void Execute(MessageEventArgs e)
         {
             string text = "";
-            Program.users.Sort();
+            Program.users.Sort((x, y) => string.Compare(x.name, y.name));
             foreach (User user in Program.users)
             {
                 //if admin

@@ -9,9 +9,9 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace ExamTrainBot.Commands
 {
-    class A_AddTest : Command
+    class A_TestAdd : Command
     {
-        public override string Name => "/addtest";
+        public override string Name => "/testadd";
 
         public override bool forAdmin => true;
 
@@ -90,14 +90,14 @@ namespace ExamTrainBot.Commands
                                     stage++; break;
                                 case 2:
                                     text = e.Message.Text;
-                                    await Program.bot.SendTextMessageAsync(user.id, "Введіть кількість балів за це запитання");
-                                    stage++; break;
-                                case 3:
-                                    points = Int32.Parse(e.Message.Text);
                                     await Program.bot.SendTextMessageAsync(user.id, "Введіть правильну відповідь");
                                     stage++; break;
-                                case 4:
+                                case 3:
                                     answer = e.Message.Text;
+                                    await Program.bot.SendTextMessageAsync(user.id, "Введіть кількість балів за це запитання");
+                                    stage++; break;
+                                case 4:
+                                    points = Int32.Parse(e.Message.Text);
                                     test.questions.Add(new ConformityQuestion(text, points, answer));
                                     await Program.bot.SendTextMessageAsync(user.id, "Питання створено.");
                                     stage = 0;

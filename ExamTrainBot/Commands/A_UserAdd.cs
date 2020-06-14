@@ -6,9 +6,9 @@ using Telegram.Bot.Args;
 
 namespace ExamTrainBot.Commands
 {
-    class A_DeleteUser : Command
+    class A_UserAdd : Command
     {
-        public override string Name => "/adduser";
+        public override string Name => "/useradd";
 
         public override bool forAdmin => true;
 
@@ -22,18 +22,18 @@ namespace ExamTrainBot.Commands
             }
             else
             {
-                if (Program.users.Find(u => u.id == Convert.ToInt64(e.Message.Text.Substring(index + 1))) != null)
+                if(Program.users.Find(u => u.id == Convert.ToInt64(e.Message.Text.Substring(index + 1))) != null)
                 {
                     User Selecteduser = Program.users.Find(u => u.id == e.Message.Chat.Id);
-                    if (Selecteduser.subscriber)
+                    if (!Selecteduser.subscriber)
                     {
-                        Selecteduser.subscriber = false;
-                        await Program.bot.SendTextMessageAsync(currentuser.id, $"Ви видалили {Selecteduser.name} до списку підписчиків!");
+                        Selecteduser.subscriber = true;
+                        await Program.bot.SendTextMessageAsync(currentuser.id, $"Ви додали {Selecteduser.name} до списку підписчиків!");
                         SaveSystem.Save();
                     }
                     else
                     {
-                        await Program.bot.SendTextMessageAsync(currentuser.id, $"Користувач {Selecteduser.name} не є підписчиком!");
+                        await Program.bot.SendTextMessageAsync(currentuser.id, $"Користувач {Selecteduser.name} вже є підписчиком!");
                     }
                 }
                 else
@@ -41,7 +41,6 @@ namespace ExamTrainBot.Commands
                     await Program.bot.SendTextMessageAsync(currentuser.id, $"Користувача з id {e.Message.Text.Substring(index + 1)} не знайдено");
                 }
             }
-
         }
     }
 }

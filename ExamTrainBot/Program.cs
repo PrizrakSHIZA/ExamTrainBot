@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
+using System.Threading;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -20,6 +21,8 @@ namespace ExamTrainBot
         public static List<Test> testlist = new List<Test>();
         public static string password = "1234";
 
+        static Timer timer;
+
         static void Main(string[] args)
         {
             //Loading data
@@ -29,6 +32,9 @@ namespace ExamTrainBot
 
             //add all tests;
             AddAllTests();
+
+            //Initialize timer
+            InitializeTimer(19, 51);
 
             //Initialize bot client
             bot = new TelegramBotClient(APIKeys.TestBotApi) { Timeout = TimeSpan.FromSeconds(10) };
@@ -239,14 +245,48 @@ namespace ExamTrainBot
                 {
                     keyboardButtons[i] = new InlineKeyboardButton
                     {
-                        Text = array[(y * 2) + i],
-                        CallbackData = array[(y * 2) + i],//((y * 2) + i + 1).ToString(),
+                        Text = array[(y * column) + i],
+                        CallbackData = array[(y * column) + i],//((y * 2) + i + 1).ToString(),
                     };
                 }
                 keyboardInline[y] = keyboardButtons;
             }
 
             return keyboardInline;
+        }
+
+        public static void InitializeTimer(int hour, int minute)
+        {
+            timer = new Timer(new TimerCallback(TestAll));
+
+            // Figure how much time until 4:00
+            DateTime now = DateTime.Now;
+            DateTime TestTime = DateTime.Today.AddHours(hour).AddMinutes(minute);
+
+            // If it's already past 4:00, wait until 4:00 tomorrow    
+            if (now > TestTime)
+            {
+                TestTime = TestTime.AddDays(1.0);
+            }
+
+            int msUntilTime = (int)((TestTime - now).TotalMilliseconds);
+
+            // Set the timer to elapse only once, at 4:00.
+            timer.Change(msUntilTime, Timeout.Infinite);
+        }
+
+        public async static void TestAll(object state)
+        {
+            foreach (User u in Program.users)
+            {
+                if (u.isadmin)
+                {
+                    u.ontest = true;
+                    u.currentquestion = 0;
+                    await Program.bot.SendTextMessageAsync(u.id, Program.testlist[User.currenttest].Text);
+                    Program.testlist[User.currenttest].questions[0].Ask(u.id);
+                }
+            }
         }
     }
 }

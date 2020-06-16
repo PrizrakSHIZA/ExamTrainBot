@@ -265,6 +265,8 @@ namespace ExamTrainBot
             TestTime = DateTime.Today.AddHours(hour).AddMinutes(minute);
             if (useTimer)
             {
+                if (timer != null)
+                    timer.Dispose();
                 timer = new Timer(new TimerCallback(TestAll));
 
                 // Figure how much time until seted time
@@ -305,11 +307,8 @@ namespace ExamTrainBot
             }
             //timer to 0:00
             Timer t = new Timer(new TimerCallback(StopTest));
-            DateTime temptime = DateTime.Today;
-            if (DateTime.Now > TestTime)
-            {
-                temptime = TestTime.AddDays(1.0);
-            }
+            DateTime temptime = DateTime.Today.AddHours(23).AddMinutes(59);
+
             int msUntilTime = (int)((temptime - DateTime.Now).TotalMilliseconds);
             t.Change(msUntilTime, Timeout.Infinite);
 

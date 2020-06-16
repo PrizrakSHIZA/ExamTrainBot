@@ -19,7 +19,9 @@ namespace ExamTrainBot
         public static List<Command> commands = new List<Command>();
         public static List<User> users = new List<User>();
         public static List<Test> testlist = new List<Test>();
-        public static string password = "1234";
+        public static DateTime TestTime = DateTime.Today.AddHours(14);
+        public static string password = APIKeys.password;
+        public static bool useTimer = false;
 
         static Timer timer;
 
@@ -34,7 +36,7 @@ namespace ExamTrainBot
             AddAllTests();
 
             //Initialize timer
-            InitializeTimer(19, 51);
+            InitializeTimer(TestTime.Hour, TestTime.Minute);
 
             //Initialize bot client
             bot = new TelegramBotClient(APIKeys.TestBotApi) { Timeout = TimeSpan.FromSeconds(10) };
@@ -63,7 +65,7 @@ namespace ExamTrainBot
                 {
                     await bot.SendTextMessageAsync(user.id, "Правильно!");
                     user.currentquestion++;
-                    user.points += question.points;
+                    user.points[^1] += question.points;
                 }
                 else
                 {
@@ -75,8 +77,7 @@ namespace ExamTrainBot
                 {
                     user.ontest = false;
                     user.currentquestion = 0;
-                    await bot.SendTextMessageAsync(user.id, $"Вітаю! Ви закінчили тест. Ви набрали {user.points} балів!");
-                    user.points = 0;
+                    await bot.SendTextMessageAsync(user.id, $"Вітаю! Ви закінчили тест. Ви набрали {user.points[^1]} балів!");
                 }
                 else
                 {
@@ -124,7 +125,7 @@ namespace ExamTrainBot
                     {
                         await bot.SendTextMessageAsync(user.id, "Правильно!");
                         user.currentquestion++;
-                        user.points += question.points;
+                        user.points[^1] += question.points;
                     }
                     else
                     {
@@ -137,7 +138,7 @@ namespace ExamTrainBot
                 {
                     await bot.SendTextMessageAsync(user.id, "Правильно!");
                     user.currentquestion++;
-                    user.points += question.points;
+                    user.points[^1] += question.points;
                 }
                 else
                 {
@@ -149,8 +150,7 @@ namespace ExamTrainBot
                 {
                     user.ontest = false;
                     user.currentquestion = 0;
-                    await bot.SendTextMessageAsync(user.id, $"Вітаю! Ви закінчили тест. Ви набрали {user.points} балів!");
-                    user.points = 0;
+                    await bot.SendTextMessageAsync(user.id, $"Вітаю! Ви закінчили тест. Ви набрали {user.points[^1]} балів!");
                 }
                 else
                 {
@@ -213,14 +213,19 @@ namespace ExamTrainBot
         private static void AddAllCommands()
         {
             commands.Add(new A_TestAdd());
+            commands.Add(new A_TestAll());
             commands.Add(new A_TestDelete());
             commands.Add(new A_TestList());
+            commands.Add(new A_TimerSet());
+            commands.Add(new A_TimerTurn());
             commands.Add(new A_UserAdd());
             commands.Add(new A_UserDelete());
             commands.Add(new A_UserList());
+            commands.Add(new A_UserResault());
             commands.Add(new AdminCommand());
             commands.Add(new HelpCommand());
             commands.Add(new TestCommand());
+            commands.Add(new Timercmd());
             commands.Sort((x, y) => string.Compare(x.Name, y.Name));
         }
 
@@ -257,22 +262,31 @@ namespace ExamTrainBot
 
         public static void InitializeTimer(int hour, int minute)
         {
-            timer = new Timer(new TimerCallback(TestAll));
-
-            // Figure how much time until 4:00
-            DateTime now = DateTime.Now;
-            DateTime TestTime = DateTime.Today.AddHours(hour).AddMinutes(minute);
-
-            // If it's already past 4:00, wait until 4:00 tomorrow    
-            if (now > TestTime)
+            TestTime = DateTime.Today.AddHours(hour).AddMinutes(minute);
+            if (useTimer)
             {
-                TestTime = TestTime.AddDays(1.0);
+                timer = new Timer(new TimerCallback(TestAll));
+
+                // Figure how much time until seted time
+                DateTime now = DateTime.Now;
+
+                // If it's already past setted time, wait until setted time tomorrow    
+                if (now > TestTime)
+                {
+                    TestTime = TestTime.AddDays(1.0);
+                }
+
+                int msUntilTime = (int)((TestTime - now).TotalMilliseconds);
+
+                // Set the timer to elapse only once, at setted teme.
+                timer.Change(msUntilTime, Timeout.Infinite);
             }
-
-            int msUntilTime = (int)((TestTime - now).TotalMilliseconds);
-
-            // Set the timer to elapse only once, at 4:00.
-            timer.Change(msUntilTime, Timeout.Infinite);
+            else
+            {
+                if(timer != null)
+                    timer.Dispose();
+                timer = null;
+            }
         }
 
         public async static void TestAll(object state)
@@ -281,12 +295,40 @@ namespace ExamTrainBot
             {
                 if (u.isadmin)
                 {
+                    u.points.Add(0);
+                    u.completedtests.Add(Program.testlist[User.currenttest]);
                     u.ontest = true;
                     u.currentquestion = 0;
                     await Program.bot.SendTextMessageAsync(u.id, Program.testlist[User.currenttest].Text);
                     Program.testlist[User.currenttest].questions[0].Ask(u.id);
                 }
             }
+            //timer to 0:00
+            Timer t = new Timer(new TimerCallback(StopTest));
+            DateTime temptime = DateTime.Today;
+            if (DateTime.Now > TestTime)
+            {
+                temptime = TestTime.AddDays(1.0);
+            }
+            int msUntilTime = (int)((temptime - DateTime.Now).TotalMilliseconds);
+            t.Change(msUntilTime, Timeout.Infinite);
+
+            Console.WriteLine(msUntilTime);
+            InitializeTimer(TestTime.Hour, TestTime.Minute);
+        }
+
+        public async static void StopTest(object state)
+        {
+            foreach (User u in Program.users)
+            {
+                if (u.isadmin && u.ontest)
+                {
+                    u.ontest = false;
+                    u.currentquestion = 0;
+                    await Program.bot.SendTextMessageAsync(u.id, $"Час на тест закінчився. Ви набрали: {u.points[^1]} балів!");
+                }
+            }
+            SaveSystem.Save();
         }
     }
 }

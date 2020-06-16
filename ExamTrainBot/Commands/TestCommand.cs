@@ -15,10 +15,12 @@ namespace ExamTrainBot.Commands
         public async override void Execute(MessageEventArgs e)
         {
             User currentuser = Program.GetCurrentUser(e.Message.Chat.Id);
+            await Program.bot.SendTextMessageAsync(currentuser.id, Program.useTimer.ToString());
+            /*
             currentuser.ontest = true;
             currentuser.currentquestion = 0;
             await Program.bot.SendTextMessageAsync(currentuser.id, Program.testlist[User.currenttest].Text);
-            Program.testlist[User.currenttest].questions[0].Ask(currentuser.id);
+            Program.testlist[User.currenttest].questions[0].Ask(currentuser.id);*/
         }
     }
 }

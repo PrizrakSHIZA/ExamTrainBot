@@ -43,7 +43,6 @@ namespace ExamTrainBot.Tests.Questions
                 if (answerarr[i] == "")
                     answerarr.Remove(answerarr[i]);
             }
-            Console.WriteLine(answerarr.Count);
             string[] rightnaswer = this.answer.Replace("-", "").ToLower().Split(delimiterChars);
             if (rightnaswer.Length != answerarr.Count)
                 return false;

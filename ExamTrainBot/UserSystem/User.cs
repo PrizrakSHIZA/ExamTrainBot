@@ -11,8 +11,10 @@ namespace ExamTrainBot
         public long id;
         public string name;
         public bool subscriber,isadmin, ontest;
-        public int points, currentquestion;
+        public int currentquestion;
         public bool testcreation;
+        public List<int> points = new List<int>();
+        public List<Test> completedtests = new List<Test>();
 
         public static int currenttest = 0;
 
@@ -23,7 +25,6 @@ namespace ExamTrainBot
             this.subscriber = ispayeduser;
             this.isadmin = isadmin;
             ontest = false;
-            points = 0;
             currentquestion = 0;
             currenttest = 0;
             testcreation = false;

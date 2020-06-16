@@ -6,6 +6,7 @@ namespace ExamTrainBot
 {
     public static partial class APIKeys
     {
+        public static readonly string password = "";
         public static readonly string TestBotApi = "";
         public static readonly string TrainBotApi = "";
     }

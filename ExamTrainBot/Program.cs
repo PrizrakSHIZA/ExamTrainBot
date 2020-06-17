@@ -304,27 +304,42 @@ namespace ExamTrainBot
 
         public async static void TestAll(object state)
         {
-            foreach (User u in Program.users)
+            //Check if program have test to send
+            if (User.currenttest + 1 > testlist.Count)
             {
-                if (u.isadmin)
+                //Send msg to admins if no
+                foreach (User u in Program.users)
                 {
-                    u.points.Add(0);
-                    u.completedtests.Add(Program.testlist[User.currenttest]);
-                    u.ontest = true;
-                    u.currentquestion = 0;
-                    await Program.bot.SendTextMessageAsync(u.id, Program.testlist[User.currenttest].Text);
-                    Program.testlist[User.currenttest].questions[0].Ask(u.id);
+                    if (u.isadmin)
+                    {
+                        await bot.SendTextMessageAsync(u.id, $"Неможливо відправити тести користувачам оскільки немає тесту за індексом {User.currenttest}!");
+                    }
                 }
             }
-            //timer to 0:00
-            Timer t = new Timer(new TimerCallback(StopTest));
-            DateTime temptime = DateTime.Today.AddHours(23).AddMinutes(59);
+            else
+            {
+                foreach (User u in Program.users)
+                {
+                    if (u.isadmin)
+                    {
+                        u.points.Add(0);
+                        u.completedtests.Add(Program.testlist[User.currenttest]);
+                        u.ontest = true;
+                        u.currentquestion = 0;
+                        await Program.bot.SendTextMessageAsync(u.id, Program.testlist[User.currenttest].Text);
+                        Program.testlist[User.currenttest].questions[0].Ask(u.id);
+                    }
+                }
+                //timer to 0:00
+                Timer t = new Timer(new TimerCallback(StopTest));
+                DateTime temptime = DateTime.Today.AddHours(23).AddMinutes(59);
 
-            int msUntilTime = (int)((temptime - DateTime.Now).TotalMilliseconds);
-            t.Change(msUntilTime, Timeout.Infinite);
+                int msUntilTime = (int)((temptime - DateTime.Now).TotalMilliseconds);
+                t.Change(msUntilTime, Timeout.Infinite);
 
-            Console.WriteLine(msUntilTime);
-            InitializeTimer(TestTime.Hour, TestTime.Minute);
+                Console.WriteLine(msUntilTime);
+                InitializeTimer(TestTime.Hour, TestTime.Minute);
+            }
         }
 
         public async static void StopTest(object state)

@@ -17,16 +17,23 @@ namespace ExamTrainBot.Commands
         public async override void Execute(MessageEventArgs e)
         {
             User user = Program.GetCurrentUser(e);
-            List<User> orderedlist = Program.users.OrderBy(u => u.points[User.currenttest - 1]).ToList();
-            string text = "Список лідерів за останнім тестом:\n";
-            for (int i = 0; i < 50; i++)
+            if (User.currenttest != 0)
             {
-                if(orderedlist[i].id == user.id)
-                    text += $"<b>{orderedlist[i].name} - {orderedlist[i].points[User.currenttest - 1]}</b>\n";
-                else
-                    text += $"{orderedlist[i].name} - {orderedlist[i].points[User.currenttest - 1]}\n";
+                List<User> orderedlist = Program.users.OrderBy(u => u.points[User.currenttest - 1]).ToList();
+                string text = "Список лідерів за останнім тестом:\n";
+                for (int i = 0; i < 50; i++)
+                {
+                    if (orderedlist[i].id == user.id)
+                        text += $"<b>{orderedlist[i].name} - {orderedlist[i].points[User.currenttest - 1]}</b>\n";
+                    else
+                        text += $"{orderedlist[i].name} - {orderedlist[i].points[User.currenttest - 1]}\n";
+                }
+                await Program.bot.SendTextMessageAsync(user.id, text, ParseMode.Html);
             }
-            await Program.bot.SendTextMessageAsync(user.id, text, ParseMode.Html);
+            else
+            {
+                await Program.bot.SendTextMessageAsync(user.id, "Ще не було проведено жодного тесту!");
+            }
         }
     }
 }

@@ -263,7 +263,7 @@ namespace ExamTrainBot
                     keyboardButtons[i] = new InlineKeyboardButton
                     {
                         Text = array[(y * column) + i],
-                        CallbackData = array[(y * column) + i],//((y * 2) + i + 1).ToString(),
+                        CallbackData = array[(y * column) + i],
                     };
                 }
                 keyboardInline[y] = keyboardButtons;
@@ -338,7 +338,6 @@ namespace ExamTrainBot
                 int msUntilTime = (int)((temptime - DateTime.Now).TotalMilliseconds);
                 t.Change(msUntilTime, Timeout.Infinite);
 
-                Console.WriteLine(msUntilTime);
                 InitializeTimer(TestTime.Hour, TestTime.Minute);
             }
         }

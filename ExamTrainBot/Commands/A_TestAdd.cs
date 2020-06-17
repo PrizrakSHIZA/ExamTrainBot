@@ -62,6 +62,13 @@ namespace ExamTrainBot.Commands
                                     stage++; break;
                                 case 3:
                                     variants = e.Message.Text.Split(delimiterChars);
+                                    for (int i = 0; i < variants.Length; i++)
+                                    {
+                                        if (variants[i].IndexOf(' ') == 0)
+                                        {
+                                            variants[i] = variants[i].Remove(0, 1);
+                                        }
+                                    }
                                     await Program.bot.SendTextMessageAsync(user.id, "Введіть кількість стовпчиків у яких будуть відображатися варіанти");
                                     stage++; break;
                                 case 4:

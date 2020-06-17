@@ -28,10 +28,12 @@ namespace ExamTrainBot.Commands
                     {
                         User.currenttest = number;
                         await Program.bot.SendTextMessageAsync(user.id, $"Увага! Тесту за даним номером не існує! Тест не буде відправлено у необхідний час чи за командою!");
+                        SaveSystem.Save();
                     }
                     else if (number < 0)
                     {
                         await Program.bot.SendTextMessageAsync(user.id, $"Номер не може бути нижче за нуль!");
+                        SaveSystem.Save();
                     }
                     else
                     {

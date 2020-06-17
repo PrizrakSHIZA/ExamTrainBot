@@ -47,7 +47,7 @@ namespace ExamTrainBot.Commands
                                 text += s + "\n";
                             }
                             text += $"Правильна відповідь: {q.answer}\n";
-                            text += $"Кількіст совпців: {q.columns}\n";
+                            text += $"Кількіст стовпців: {q.columns}\n";
                             text += $"Кількість балів: {q.points}\n";
                         }
                         else if (question.GetType() == typeof(FreeQuestion))

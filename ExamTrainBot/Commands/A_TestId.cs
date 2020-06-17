@@ -33,12 +33,12 @@ namespace ExamTrainBot.Commands
                     else if (number < 0)
                     {
                         await Program.bot.SendTextMessageAsync(user.id, $"Номер не може бути нижче за нуль!");
-                        SaveSystem.Save();
                     }
                     else
                     {
                         User.currenttest = number;
                         await Program.bot.SendTextMessageAsync(user.id, $"Номер успішно встановлено!");
+                        SaveSystem.Save();
                     }
                 }
                 catch (Exception exception)

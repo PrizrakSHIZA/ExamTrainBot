@@ -17,6 +17,7 @@ namespace ExamTrainBot
         public List<Test> completedtests = new List<Test>();
 
         public static int currenttest = 0;
+        public int currentTest_serializable { get { return currenttest; } set { currenttest = value; } }
 
         public User(long id, string name, bool ispayeduser, bool isadmin)
         {

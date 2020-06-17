@@ -21,8 +21,10 @@ namespace ExamTrainBot.Commands
             {
                 List<User> orderedlist = Program.users.OrderBy(u => u.points[User.currenttest - 1]).ToList();
                 string text = "Список лідерів за останнім тестом:\n";
-                for (int i = 0; i < 50; i++)
+                for (int i = 0; i < orderedlist.Count; i++)
                 {
+                    if (i >= 49)
+                        break;
                     if (orderedlist[i].id == user.id)
                         text += $"<b>{orderedlist[i].name} - {orderedlist[i].points[User.currenttest - 1]}</b>\n";
                     else

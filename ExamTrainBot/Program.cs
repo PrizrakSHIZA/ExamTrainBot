@@ -215,6 +215,7 @@ namespace ExamTrainBot
             commands.Add(new A_TestAdd());
             commands.Add(new A_TestAll());
             commands.Add(new A_TestDelete());
+            commands.Add(new A_TestId());
             commands.Add(new A_TestList());
             commands.Add(new A_TimerSet());
             commands.Add(new A_TimerTurn());

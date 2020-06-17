@@ -23,7 +23,7 @@ namespace ExamTrainBot.Commands
             {
                 if (Program.users.Find(u => u.id == Convert.ToInt64(e.Message.Text.Substring(index + 1))) != null)
                 {
-                    User Selecteduser = Program.users.Find(u => u.id == e.Message.Chat.Id);
+                    User Selecteduser = Program.users.Find(u => u.id == Convert.ToInt32(e.Message.Text.Substring(index + 1)));
                     string text = $"Результати тестів {Selecteduser.name}:\n";
                     for (int i = 0; i < user.completedtests.Count; i++)
                     { 

@@ -223,10 +223,11 @@ namespace ExamTrainBot
             commands.Add(new A_UserDelete());
             commands.Add(new A_UserList());
             commands.Add(new A_UserResault());
-            commands.Add(new AdminCommand());
+            commands.Add(new AdminCmd());
             commands.Add(new HelpCommand());
-            commands.Add(new TestCommand());
-            commands.Add(new Timercmd());
+            commands.Add(new RecordsCmd());
+            commands.Add(new TestCmd());
+            commands.Add(new TimerCmd());
             commands.Sort((x, y) => string.Compare(x.Name, y.Name));
         }
 

@@ -6,7 +6,7 @@ using Telegram.Bot.Args;
 
 namespace ExamTrainBot.Commands
 {
-    class AdminCommand : Command
+    class AdminCmd : Command
     {
         public override string Name => "/admin";
 

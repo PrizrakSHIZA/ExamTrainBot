@@ -5,7 +5,7 @@ using Telegram.Bot.Args;
 
 namespace ExamTrainBot.Commands
 {
-    class Timercmd : Command
+    class TimerCmd : Command
     {
         public override string Name => "/timer";
 

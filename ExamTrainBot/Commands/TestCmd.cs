@@ -7,7 +7,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace ExamTrainBot.Commands
 {
-    class TestCommand : Command
+    class TestCmd : Command
     {
         public override string Name => "/test";
 

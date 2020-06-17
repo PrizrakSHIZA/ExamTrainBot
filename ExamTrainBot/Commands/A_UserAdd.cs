@@ -14,11 +14,11 @@ namespace ExamTrainBot.Commands
 
         public async override void Execute(MessageEventArgs e)
         {
-            User currentuser = Program.users.Find(u => u.id == e.Message.Chat.Id);
+            User user = Program.users.Find(u => u.id == e.Message.Chat.Id);
             int index = e.Message.Text.IndexOf(" ");
             if (index == -1)
             {
-                await Program.bot.SendTextMessageAsync(currentuser.id, "Використовуйте команду наступним чином: /adduser 'user id'");
+                await Program.bot.SendTextMessageAsync(user.id, "Використовуйте команду наступним чином: /adduser 'user id'");
             }
             else
             {
@@ -28,17 +28,17 @@ namespace ExamTrainBot.Commands
                     if (!Selecteduser.subscriber)
                     {
                         Selecteduser.subscriber = true;
-                        await Program.bot.SendTextMessageAsync(currentuser.id, $"Ви додали {Selecteduser.name} до списку підписчиків!");
+                        await Program.bot.SendTextMessageAsync(user.id, $"Ви додали {Selecteduser.name} до списку підписчиків!");
                         SaveSystem.Save();
                     }
                     else
                     {
-                        await Program.bot.SendTextMessageAsync(currentuser.id, $"Користувач {Selecteduser.name} вже є підписчиком!");
+                        await Program.bot.SendTextMessageAsync(user.id, $"Користувач {Selecteduser.name} вже є підписчиком!");
                     }
                 }
                 else
                 {
-                    await Program.bot.SendTextMessageAsync(currentuser.id, $"Користувача з id {e.Message.Text.Substring(index + 1)} не знайдено");
+                    await Program.bot.SendTextMessageAsync(user.id, $"Користувача з id {e.Message.Text.Substring(index + 1)} не знайдено");
                 }
             }
         }

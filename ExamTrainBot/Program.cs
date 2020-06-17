@@ -55,7 +55,7 @@ namespace ExamTrainBot
 
         private async static void Bot_OnCallbackQuery(object sender, CallbackQueryEventArgs e)
         {
-            User user = GetCurrentUser(e.CallbackQuery.From.Id);
+            User user = GetCurrentUser(e);
             //if user is on test
             if (user.ontest)
             {
@@ -238,6 +238,17 @@ namespace ExamTrainBot
         {
             return users.Find(u => u.id == id);
         }
+        public static User GetCurrentUser(MessageEventArgs e)
+        {
+            long id = e.Message.Chat.Id;
+            return users.Find(u => u.id == id);
+        }
+        public static User GetCurrentUser(CallbackQueryEventArgs e)
+        {
+            long id = e.CallbackQuery.From.Id;
+            return users.Find(u => u.id == id);
+        }
+
 
         public static InlineKeyboardMarkup GetInlineKeyboard(string[] array, int column)
         {

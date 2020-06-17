@@ -13,6 +13,10 @@ namespace ExamTrainBot.Commands
 
         public async override void Execute(MessageEventArgs e)
         {
+            User user = Program.GetCurrentUser(e);
+            Program.TestAll(new object());
+            await Program.bot.SendTextMessageAsync(user.id, "Тести відправлені!");
+            /*
             foreach (User u in Program.users)
             {
                 if (u.isadmin)
@@ -24,7 +28,7 @@ namespace ExamTrainBot.Commands
                     await Program.bot.SendTextMessageAsync(u.id, Program.testlist[User.currenttest].Text);
                     Program.testlist[User.currenttest].questions[0].Ask(u.id);
                 }
-            }
+            }*/
         }
     }
 }

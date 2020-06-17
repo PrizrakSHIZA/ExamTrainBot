@@ -26,7 +26,7 @@ namespace ExamTrainBot.Commands
 
         public async override void Execute(MessageEventArgs e)
         {
-            User user = Program.GetCurrentUser(e.Message.Chat.Id);
+            User user = Program.GetCurrentUser(e);
             if (!user.testcreation)
             {
                 int index = e.Message.Text.IndexOf(" ");

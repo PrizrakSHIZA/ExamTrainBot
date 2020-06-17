@@ -13,7 +13,7 @@ namespace ExamTrainBot.Commands
 
         public async override void Execute(MessageEventArgs e)
         {
-            User user = Program.GetCurrentUser(e.Message.Chat.Id);
+            User user = Program.GetCurrentUser(e);
             await Program.bot.SendTextMessageAsync(user.id, $"Таймер встановлено на {Program.TestTime.Hour}:{Program.TestTime.Minute}");
         }
     }

@@ -14,7 +14,7 @@ namespace ExamTrainBot.Commands
         public override bool forAdmin => false;
         public async override void Execute(MessageEventArgs e)
         {
-            User currentuser = Program.GetCurrentUser(e.Message.Chat.Id);
+            User currentuser = Program.GetCurrentUser(e);
             await Program.bot.SendTextMessageAsync(currentuser.id, Program.useTimer.ToString());
             /*
             currentuser.ontest = true;

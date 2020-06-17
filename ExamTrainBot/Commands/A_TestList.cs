@@ -15,7 +15,7 @@ namespace ExamTrainBot.Commands
 
         public async override void Execute(MessageEventArgs e)
         {
-            User user = Program.GetCurrentUser(e.Message.Chat.Id);
+            User user = Program.GetCurrentUser(e);
             try
             {
                 string text = "";

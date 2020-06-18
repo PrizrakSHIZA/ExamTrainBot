@@ -25,9 +25,17 @@ namespace ExamTrainBot.Commands
                 {
                     User Selecteduser = Program.users.Find(u => u.id == Convert.ToInt32(e.Message.Text.Substring(index + 1)));
                     string text = $"Результати тестів {Selecteduser.name}:\n";
+                    //create string
                     for (int i = 0; i < user.completedtests.Count; i++)
-                    { 
-                        text += $"Текст тесту: { user.completedtests[i].Text} => {user.points[i]} балів\n";
+                    {
+                        string mistakes = "Помилки у питання за номерами: ";
+                        //looking for mistakes
+                        for (int y = 0; y < user.completedtests[i].questions.Count; y++)
+                        {
+                            if (user.mistakes[i][y])
+                                mistakes += $"{y+1}, ";
+                        }
+                        text += $"Текст тесту: {user.completedtests[i].Text}\n=> {mistakes}\n=> {user.points[i]} балів\n";
                     }
                     await Program.bot.SendTextMessageAsync(user.id, text);
                 }

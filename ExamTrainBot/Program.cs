@@ -3,6 +3,7 @@ using ExamTrainBot.Tests;
 using ExamTrainBot.Tests.Questions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
@@ -70,6 +71,7 @@ namespace ExamTrainBot
                 else
                 {
                     await bot.SendTextMessageAsync(user.id, $"Неправильно! Правильна відповідь: {question.answer}");
+                    user.mistakes[^1][user.currentquestion] = true;
                     user.currentquestion++;
                 }
                 //Check if its last question in test
@@ -130,6 +132,7 @@ namespace ExamTrainBot
                     else
                     {
                         await bot.SendTextMessageAsync(user.id, $"Неправильно! Правильна відповідь: {question.answer}");
+                        user.mistakes[^1][user.currentquestion] = true;
                         user.currentquestion++;
                     }
                 }
@@ -143,6 +146,7 @@ namespace ExamTrainBot
                 else
                 {
                     await bot.SendTextMessageAsync(user.id, $"Неправильно! Правильна відповідь: {question.answer}");
+                    user.mistakes[^1][user.currentquestion] = true;
                     user.currentquestion++;
                 }
                 //Check if its last question in test
@@ -324,6 +328,9 @@ namespace ExamTrainBot
                 {
                     if (u.isadmin)
                     {
+                        //create bool array filled with false value
+                        bool[] tempbool = Enumerable.Repeat(false, testlist[User.currenttest].questions.Count + 1).ToArray();
+                        u.mistakes.Add(tempbool);
                         u.points.Add(0);
                         u.completedtests.Add(Program.testlist[User.currenttest]);
                         u.ontest = true;

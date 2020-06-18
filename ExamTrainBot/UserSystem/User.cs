@@ -15,15 +15,16 @@ namespace ExamTrainBot
         public bool testcreation;
         public List<int> points = new List<int>();
         public List<Test> completedtests = new List<Test>();
+        public List<bool[]> mistakes = new List<bool[]>();
 
         public static int currenttest = 0;
         public int currentTest_serializable { get { return currenttest; } set { currenttest = value; } }
 
-        public User(long id, string name, bool ispayeduser, bool isadmin)
+        public User(long id, string name, bool subscriber, bool isadmin)
         {
             this.id = id;
             this.name = name;
-            this.subscriber = ispayeduser;
+            this.subscriber = subscriber;
             this.isadmin = isadmin;
             ontest = false;
             currentquestion = 0;

@@ -20,8 +20,6 @@ namespace ExamTrainBot.Commands
         public int points, columns, stage = 0;
         public string[] variants;
 
-        
-        char[] delimiterChars = { ',', '.', '\t', '\n' };
         MessageEventArgs y;
 
         public async override void Execute(MessageEventArgs e)
@@ -61,7 +59,7 @@ namespace ExamTrainBot.Commands
                                     await Program.bot.SendTextMessageAsync(user.id, "Введіть варіванти відповідей(використовуйте ',', '.', табуляцію або нову стрічку для розділення варіантів)");
                                     stage++; break;
                                 case 3:
-                                    variants = e.Message.Text.Split(delimiterChars);
+                                    variants = e.Message.Text.Split(Program.delimiterChars);
                                     for (int i = 0; i < variants.Length; i++)
                                     {
                                         if (variants[i].IndexOf(' ') == 0)

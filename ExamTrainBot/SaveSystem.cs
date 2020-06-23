@@ -4,7 +4,6 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System;
 using ExamTrainBot;
 using ExamTrainBot.Commands;
-using Json.Net;
 using ExamTrainBot.Tests;
 using Newtonsoft.Json;
 

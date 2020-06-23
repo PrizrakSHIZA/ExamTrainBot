@@ -1,12 +1,11 @@
 ﻿using ExamTrainBot.Commands;
 using ExamTrainBot.Tests;
 using ExamTrainBot.Tests.Questions;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
+//using System.Data.SqlClient;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
 using Telegram.Bot;
 using Telegram.Bot.Args;
@@ -20,16 +19,29 @@ namespace ExamTrainBot
         public static List<Command> commands = new List<Command>();
         public static List<User> users = new List<User>();
         public static List<Test> testlist = new List<Test>();
+        public static List<Question> questions = new List<Question>();
         public static DateTime TestTime = DateTime.Today.AddHours(14);
+        public static MySqlConnection con = new MySqlConnection(
+                    new MySqlConnectionStringBuilder()
+                    {
+                        Server = APIKeys.DBServer,
+                        Database = APIKeys.DBName,
+                        UserID = APIKeys.DBUser,
+                        Password = APIKeys.DBPassword
+                    }.ConnectionString
+                );
         public static string password = APIKeys.password;
         public static bool useTimer = false;
+        public static char[] delimiterChars = { ',', '.', '\t', '\n', ';' };
 
         static Timer timer;
 
         static void Main(string[] args)
         {
             //Loading data
-            SaveSystem.Load();
+            LoadFromDB();
+            //SaveSystem.Load();
+
             //Add all commands
             AddAllCommands();
 
@@ -362,6 +374,79 @@ namespace ExamTrainBot
                 }
             }
             SaveSystem.Save();
+        }
+
+        public static void LoadFromDB()
+        {
+            try
+            {
+                con.Open();
+
+                //Load Questions
+                string command = "SELECT * FROM questions";
+                MySqlCommand cmd = new MySqlCommand(command, con);
+
+                MySqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    switch (reader.GetInt32("type"))
+                    {
+                        case 1: questions.Add(new TestQuestion(
+                            reader.GetString("text"), 
+                            reader.GetInt32("points"),
+                            reader.GetString("variants").Replace(" ","").Split(delimiterChars), 
+                            reader.GetInt32("columns"), 
+                            reader.GetString("answer"))); break;
+                        case 2: questions.Add(new FreeQuestion(
+                            reader.GetString("text"),
+                            reader.GetInt32("points"),
+                            reader.GetString("answer")
+                            )); break;
+                        case 3: questions.Add(new ConformityQuestion(
+                            reader.GetString("text"),
+                            reader.GetInt32("points"),
+                            reader.GetString("answer")
+                            )); break;
+                        default: break;
+                    }
+                }
+                reader.Close();
+
+                //Load Tests
+                command = "SELECT * FROM tests";
+                cmd = new MySqlCommand(command, con);
+
+                reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    string[] ids = reader.GetString("questions").Replace(" ", "").Split(delimiterChars);
+                    List<Question> q = new List<Question>();
+                    for (int i = 0; i < ids.Length; i++)
+                    {
+                        q.Add(questions[ Int32.Parse(ids[i]) - 1 ]);
+                    }
+                    testlist.Add(new Test(reader.GetString("rule"), q));
+                }
+                reader.Close();
+
+                //Load Users
+                command = "SELECT * FROM users";
+                cmd = new MySqlCommand(command, con);
+
+                reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    users.Add(new User(reader.GetInt32("ID"), reader.GetString("Name") + " " + reader.GetString("Soname"), Convert.ToBoolean(reader.GetUInt32("Subscriber")), Convert.ToBoolean(reader.GetUInt32("Admin"))));
+                }
+                reader.Close();
+
+                con.Close();
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception.Message);
+                Console.WriteLine("Потрібен перезапуск");
+            }
         }
     }
 }

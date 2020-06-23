@@ -42,13 +42,17 @@
       "frameworks": {
         "netcoreapp3.1": {
           "dependencies": {
-            "Json.Net": {
+            "MySql.Data": {
               "target": "Package",
-              "version": "[1.0.22, )"
+              "version": "[8.0.20, )"
+            },
+            "System.Data.SqlClient": {
+              "target": "Package",
+              "version": "[4.8.1, )"
             },
             "Telegram.Bot": {
               "target": "Package",
-              "version": "[15.6.0, )"
+              "version": "[15.7.1, )"
             }
           },
           "imports": [

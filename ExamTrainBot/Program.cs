@@ -4,7 +4,6 @@ using ExamTrainBot.Tests.Questions;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
-//using System.Data.SqlClient;
 using System.Linq;
 using System.Threading;
 using Telegram.Bot;
@@ -111,8 +110,9 @@ namespace ExamTrainBot
             //check if new user
             if (users.Find(u => u.id == e.Message.Chat.Id) == null)
             {
-                users.Add(new User(e.Message.Chat.Id, e.Message.Chat.FirstName + " " + e.Message.Chat.LastName, false, false));
-                SaveSystem.Save();
+                if (ExecuteMySql($"INSERT INTO Users(ID, Name, Soname) VALUES ({e.Message.Chat.Id}, '{e.Message.Chat.FirstName}', '{e.Message.Chat.LastName}')"))
+                    users.Add(new User(e.Message.Chat.Id, e.Message.Chat.FirstName + " " + e.Message.Chat.LastName, false, false));
+                //SaveSystem.Save();
             }
             //Add user in temp var
             User user = users.Find(u => u.id == e.Message.Chat.Id);
@@ -446,6 +446,23 @@ namespace ExamTrainBot
             {
                 Console.WriteLine(exception.Message);
                 Console.WriteLine("Потрібен перезапуск");
+            }
+        }
+
+        public static bool ExecuteMySql(string command)
+        {
+            try
+            {
+                MySqlCommand cmd = new MySqlCommand(command, Program.con);
+                con.Open();
+                cmd.ExecuteNonQuery();
+                con.Close();
+                return true;
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"Помилка у виконанні команди до Бази данних. Текст помилки:\n{exception.Message}");
+                return false;
             }
         }
     }

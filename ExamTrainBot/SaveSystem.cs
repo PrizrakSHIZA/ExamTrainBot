@@ -6,6 +6,8 @@ using ExamTrainBot;
 using ExamTrainBot.Commands;
 using ExamTrainBot.Tests;
 using Newtonsoft.Json;
+using MySql.Data.MySqlClient;
+using Telegram.Bot.Args;
 
 namespace ExamTrainBot
 {

@@ -27,9 +27,16 @@ namespace ExamTrainBot.Commands
                     User Selecteduser = Program.users.Find(u => u.id == e.Message.Chat.Id);
                     if (!Selecteduser.subscriber)
                     {
-                        Selecteduser.subscriber = true;
-                        await Program.bot.SendTextMessageAsync(user.id, $"Ви додали {Selecteduser.name} до списку підписчиків!");
-                        SaveSystem.Save();
+                        //Edit in DB
+                        if (Program.ExecuteMySql($"UPDATE Users SET Subscriber = 1 WHERE ID = {Selecteduser.id}"))
+                        {
+                            Selecteduser.subscriber = true;
+                            await Program.bot.SendTextMessageAsync(user.id, $"Ви додали {Selecteduser.name} до списку підписчиків!");
+                        }
+                        else
+                        {
+                            await Program.bot.SendTextMessageAsync(user.id, $"Виникла помилка при додаванні {Selecteduser.name} до списку підписчиків!\nБудь ласка, зверніться до технічного адміністратора!");
+                        }
                     }
                     else
                     {

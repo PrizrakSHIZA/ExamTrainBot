@@ -1,10 +1,8 @@
-﻿using ExamTrainBot.Commands;
-using ExamTrainBot.Tests;
+﻿using ExamTrainBot.Tests;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Text;
+using System.Text.Json;
 
 namespace ExamTrainBot
 {
@@ -18,8 +16,8 @@ namespace ExamTrainBot
         public bool testcreation = false;
         public List<int> points = new List<int>();
         public List<Test> completedtests = new List<Test>();
-        //public List<bool[]> mistakes = new List<bool[]>();
-        public List<int> mistakes = new List<int>();
+        public List<bool[]> mistakes = new List<bool[]>();
+        //public List<int> mistakes = new List<int>();
 
         public static int currenttest = 0;
         public int currentTest_serializable { get { return currenttest; } set { currenttest = value; } }
@@ -45,7 +43,7 @@ namespace ExamTrainBot
                 {
                     completedtests.Add(Program.testlist[temp[i] - 1]);
                 }
-                this.mistakes = mistakes.Replace(" ", "").Split(Program.delimiterChars, StringSplitOptions.RemoveEmptyEntries).Select(Int32.Parse).ToList();
+                this.mistakes = JsonSerializer.Deserialize<List<bool[]>>(mistakes);
             }
         }
     }

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Text.Json;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -82,7 +83,8 @@ namespace ExamTrainBot
                 else
                 {
                     await bot.SendTextMessageAsync(user.id, $"Неправильно! Правильна відповідь: {question.answer}");
-                    user.mistakes.Add(questions.IndexOf(testlist[User.currenttest].questions[user.currentquestion]));
+                    user.mistakes[^1][user.currentquestion] = true;
+                    //user.mistakes.Add(questions.IndexOf(testlist[User.currenttest].questions[user.currentquestion]));
                     user.currentquestion++;
                 }
                 //Check if its last question in test
@@ -145,7 +147,8 @@ namespace ExamTrainBot
                     else
                     {
                         await bot.SendTextMessageAsync(user.id, $"Неправильно! Правильна відповідь: {question.answer}");
-                        user.mistakes.Add(questions.IndexOf(testlist[User.currenttest].questions[user.currentquestion]));
+                        user.mistakes[^1][user.currentquestion] = true;
+                        //user.mistakes.Add(questions.IndexOf(testlist[User.currenttest].questions[user.currentquestion]));
                         user.currentquestion++;
                     }
                 }
@@ -159,13 +162,14 @@ namespace ExamTrainBot
                 else
                 {
                     await bot.SendTextMessageAsync(user.id, $"Неправильно! Правильна відповідь: {question.answer}");
-                    user.mistakes.Add(questions.IndexOf(testlist[User.currenttest].questions[user.currentquestion]));
+                    user.mistakes[^1][user.currentquestion] = true;
+                    //user.mistakes.Add(questions.IndexOf(testlist[User.currenttest].questions[user.currentquestion]));
                     user.currentquestion++;
                 }
                 //Check if its last question in test
                 if (user.currentquestion >= testlist[User.currenttest].questions.Count)
                 {
-                    ExecuteMySql($"UPDATE Users SET Points = CONCAT(points, '{user.points[^1] + 1};'), Mistakes = CONCAT(Mistakes, '{string.Join(';', user.mistakes)}') WHERE ID = {user.id}");
+                    ExecuteMySql($"UPDATE Users SET Points = CONCAT(points, '{user.points[^1] + 1};'), Mistakes = '{JsonSerializer.Serialize(user.mistakes)}' WHERE ID = {user.id}");
                     user.ontest = false;
                     user.currentquestion = 0;
                     await bot.SendTextMessageAsync(user.id, $"Вітаю! Ви закінчили тест. Ви набрали {user.points[^1]} балів!");
@@ -345,6 +349,9 @@ namespace ExamTrainBot
                     {
                         if (u.isadmin)
                         {
+                            bool[] tempbool = Enumerable.Repeat(false, testlist[User.currenttest].questions.Count + 1).ToArray();
+                            u.mistakes.Add(tempbool);
+
                             u.points.Add(0);
                             u.completedtests.Add(Program.testlist[User.currenttest]);
                             u.ontest = true;

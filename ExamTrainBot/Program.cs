@@ -45,9 +45,6 @@ namespace ExamTrainBot
             //Add all commands
             AddAllCommands();
 
-            //add all tests;
-            AddAllTests();
-
             //Initialize timer
             InitializeTimer(TestTime.Hour, TestTime.Minute);
 
@@ -84,7 +81,6 @@ namespace ExamTrainBot
                 {
                     await bot.SendTextMessageAsync(user.id, $"Неправильно! Правильна відповідь: {question.answer}");
                     user.mistakes[^1][user.currentquestion] = true;
-                    //user.mistakes.Add(questions.IndexOf(testlist[User.currenttest].questions[user.currentquestion]));
                     user.currentquestion++;
                 }
                 //Check if its last question in test
@@ -113,8 +109,8 @@ namespace ExamTrainBot
             //check if new user
             if (users.Find(u => u.id == e.Message.Chat.Id) == null)
             {
-                if (ExecuteMySql($"INSERT INTO Users(ID, Name, Soname) VALUES ({e.Message.Chat.Id}, '{e.Message.Chat.FirstName}', '{e.Message.Chat.LastName}')"))
-                    users.Add(new User(e.Message.Chat.Id, e.Message.Chat.FirstName + " " + e.Message.Chat.LastName));
+                if (ExecuteMySql($"INSERT INTO Users(ID, Name, Soname, Date) VALUES ({e.Message.Chat.Id}, '{e.Message.Chat.FirstName}', '{e.Message.Chat.LastName}', '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}')"))
+                    users.Add(new User(e.Message.Chat.Id, e.Message.Chat.FirstName + " " + e.Message.Chat.LastName, false, false, "", "", "", DateTime.Now));
                 //SaveSystem.Save();
             }
             //Add user in temp var
@@ -148,7 +144,6 @@ namespace ExamTrainBot
                     {
                         await bot.SendTextMessageAsync(user.id, $"Неправильно! Правильна відповідь: {question.answer}");
                         user.mistakes[^1][user.currentquestion] = true;
-                        //user.mistakes.Add(questions.IndexOf(testlist[User.currenttest].questions[user.currentquestion]));
                         user.currentquestion++;
                     }
                 }
@@ -163,7 +158,6 @@ namespace ExamTrainBot
                 {
                     await bot.SendTextMessageAsync(user.id, $"Неправильно! Правильна відповідь: {question.answer}");
                     user.mistakes[^1][user.currentquestion] = true;
-                    //user.mistakes.Add(questions.IndexOf(testlist[User.currenttest].questions[user.currentquestion]));
                     user.currentquestion++;
                 }
                 //Check if its last question in test
@@ -203,33 +197,6 @@ namespace ExamTrainBot
                     await bot.SendTextMessageAsync(user.id, "Такої команди не уснує. Для списку усіх команд введіть: '/help'");
                 }
             }
-        }
-
-        private static void AddAllTests()
-        {
-            /*
-            testlist.Add(new Test
-            {
-                Text = "Відсотком (процентом) називають число одну соту. Отже, 1:100 = 1%; 100% = 100:100 = 1; 50% = 50:100 = 1:2; 25% = 25:100 = 1:4\n" +
-                        "Тоді 100% числа а дорівнюють а, 50% числа а дорівнюють 1:2*а, 25% числа а ставновлять 1:4*а.\n" +
-                        "Щоб перетворити десятковий дріб у відсотки, потрібно помножити його на 100.\n" +
-                        "Щоб перетворити відсотки у десятковий дріб, потрібно число відсотків поділити на 100.\n" +
-                        "Наприклад: а) 0,002 = 0,002 * 100% = 0,2%; 0,07 = 0,07 * 100% = 7%; 1,34 = 1,34 * 100% = 134%;\n" +
-                        "б) 2,3% = 2,3% : 100% = 0,023; 40% = 40% : 100% = 0,4; 263% = 263% : 100% = 2,63",
-                questions = new List<Question>()
-                {
-                    new TestQuestion("Як знайти 52% від числа 960?", 2, new string[] {"960 * 100 : 52","52 * 100 : 96","960 * 52 : 100","960 : 52", "960 * 52"}, 2, "960 * 52 : 100"),
-                    new TestQuestion("Як знайти число, 60% від якого дорівнюють 360?", 2, new string[] {"360 * 60","360 : 60","60 * 100 : 360","360 * 60 : 100","360 * 100 : 60"}, 2, "360 * 100 : 60"),
-                    new TestQuestion("(ЗНО-2010) За видачу свідоцтва про право на спадщину стягується державне мито в розмірі\n"
-                                    +"0,5% від вартості майна, що успадковується. Скільки державного мита повинен сплатити спадкоємець,\n"
-                                    +"якщо вартість майна, що успадковується, становить 32 000 грн?",
-                                    3, new string[] {"16 грн","64 грн","160 грн","320 грн","1600 грн"}, 2, "160 грн"),
-                    new TestQuestion("2 кг сплаву міді з оловом містить 40% міді. Скільки потрібно додати до цього сплаву олова,\nщоб отриманий сплав містив 16% міді?", 4, new string[] {"3 кг","2,5 кг","2 кг","4 кг","3,5 кг"}, 2, "3 кг"),
-                    new FreeQuestion("Яка тварина є самою вірною людині?",2,"Собака"),
-                    new ConformityQuestion("Об'єднайте правильно: \nА)Техніка\nБ)Тварина\nВ)Комаха\nГ)Людина\n\n1)Собака\n2)Міша\n3)Літак\n4)Павук",4,"А-3,Б-1,В-4,Г-2"),
-                },
-            });*/
-            SaveSystem.SaveTests();
         }
 
         private static void AddAllCommands()
@@ -272,7 +239,6 @@ namespace ExamTrainBot
             long id = e.CallbackQuery.From.Id;
             return users.Find(u => u.id == id);
         }
-
 
         public static InlineKeyboardMarkup GetInlineKeyboard(string[] array, int column)
         {
@@ -463,7 +429,8 @@ namespace ExamTrainBot
                         Convert.ToBoolean(reader.GetUInt32("Admin")), 
                         reader.GetString("Points"),
                         reader.GetString("CompletedTests"),
-                        reader.GetString("Mistakes")
+                        reader.GetString("Mistakes"),
+                        reader.GetDateTime("Date")
                         ));
                 }
                 reader.Close();

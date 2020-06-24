@@ -17,7 +17,7 @@ namespace ExamTrainBot
         public List<int> points = new List<int>();
         public List<Test> completedtests = new List<Test>();
         public List<bool[]> mistakes = new List<bool[]>();
-        //public List<int> mistakes = new List<int>();
+        public DateTime date;
 
         public static int currenttest = 0;
         public int currentTest_serializable { get { return currenttest; } set { currenttest = value; } }
@@ -29,7 +29,7 @@ namespace ExamTrainBot
             this.subscriber = false;
             this.isadmin = false;
         }
-        public User(long id, string name, bool subscriber, bool isadmin, string points, string tests, string mistakes)
+        public User(long id, string name, bool subscriber, bool isadmin, string points, string tests, string mistakes, DateTime date)
         {
             this.id = id;
             this.name = name;
@@ -45,6 +45,7 @@ namespace ExamTrainBot
                 }
                 this.mistakes = JsonSerializer.Deserialize<List<bool[]>>(mistakes);
             }
+            this.date = date;
         }
     }
 }

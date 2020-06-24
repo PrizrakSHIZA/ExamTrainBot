@@ -35,17 +35,7 @@ namespace ExamTrainBot.Commands
                             if (user.mistakes[i][y])
                                 mistakes += $"{y + 1}, ";
                         }
-                        /*
-                        for (int y = 0; y < user.completedtests[i].questions.Count; y++)
-                        {
-                            foreach (int id in user.mistakes)
-                            {
-                                if (user.completedtests[i].questions[y] == Program.questions[id])
-                                {
-                                    mistakes += $" {y+1},";
-                                }
-                            }
-                        }*/
+
                         text += $"Текст тесту: {user.completedtests[i].Text}\n=> {mistakes}\n=> {user.points[i]} балів\n";
                     }
                     await Program.bot.SendTextMessageAsync(user.id, text);

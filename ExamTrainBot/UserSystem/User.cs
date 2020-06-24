@@ -18,7 +18,8 @@ namespace ExamTrainBot
         public bool testcreation = false;
         public List<int> points = new List<int>();
         public List<Test> completedtests = new List<Test>();
-        public List<bool[]> mistakes = new List<bool[]>();
+        //public List<bool[]> mistakes = new List<bool[]>();
+        public List<int> mistakes = new List<int>();
 
         public static int currenttest = 0;
         public int currentTest_serializable { get { return currenttest; } set { currenttest = value; } }
@@ -36,7 +37,7 @@ namespace ExamTrainBot
             this.name = name;
             this.subscriber = subscriber;
             this.isadmin = isadmin;
-            if (points != "" || tests != "")
+            if (points != "" || tests != "" || mistakes != "")
             {
                 this.points = points.Replace(" ", "").Split(Program.delimiterChars, StringSplitOptions.RemoveEmptyEntries).Select(Int32.Parse).ToList();
                 int[] temp = tests.Replace(" ", "").Split(Program.delimiterChars, StringSplitOptions.RemoveEmptyEntries).Select(Int32.Parse).ToArray();
@@ -44,6 +45,7 @@ namespace ExamTrainBot
                 {
                     completedtests.Add(Program.testlist[temp[i] - 1]);
                 }
+                this.mistakes = mistakes.Replace(" ", "").Split(Program.delimiterChars, StringSplitOptions.RemoveEmptyEntries).Select(Int32.Parse).ToList();
             }
         }
     }

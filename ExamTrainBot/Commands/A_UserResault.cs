@@ -32,8 +32,13 @@ namespace ExamTrainBot.Commands
                         //looking for mistakes
                         for (int y = 0; y < user.completedtests[i].questions.Count; y++)
                         {
-                            if (user.mistakes[i][y])
-                                mistakes += $"{y+1}, ";
+                            foreach (int id in user.mistakes)
+                            {
+                                if (user.completedtests[i].questions[y] == Program.questions[id])
+                                {
+                                    mistakes += $" {y+1},";
+                                }
+                            }
                         }
                         text += $"Текст тесту: {user.completedtests[i].Text}\n=> {mistakes}\n=> {user.points[i]} балів\n";
                     }

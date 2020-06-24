@@ -26,9 +26,16 @@ namespace ExamTrainBot.Commands
                     int number = Int32.Parse(e.Message.Text.Substring(index + 1));
                     if (Program.testlist[number] != null)
                     {
-                        Program.testlist.RemoveAt(number);
-                        SaveSystem.SaveTests();
-                        await Program.bot.SendTextMessageAsync(currentuser.id, $"Тест за номером {number} успішно видалено зі списку!");
+                        if (Program.ExecuteMySql($"DELETE FROM Tests WHERE ID = {number + 1}"))
+                        {
+                            Program.testlist.RemoveAt(number);
+                            //SaveSystem.SaveTests();
+                            await Program.bot.SendTextMessageAsync(currentuser.id, $"Тест за номером {number} успішно видалено зі списку!");
+                        }
+                        else 
+                        {
+                            await Program.bot.SendTextMessageAsync(currentuser.id, $"Виникла помилка при внесенні змін у БД. Будь ласка, зверніться до технічного адміністратора!");
+                        }
                     }
                     else
                     {

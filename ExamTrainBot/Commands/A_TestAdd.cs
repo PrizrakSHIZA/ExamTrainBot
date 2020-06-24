@@ -19,6 +19,7 @@ namespace ExamTrainBot.Commands
         public string callback, text, answer;
         public int points, columns, stage = 0;
         public string[] variants;
+        public List<int> questions = new List<int>();
 
         MessageEventArgs y;
 
@@ -79,11 +80,22 @@ namespace ExamTrainBot.Commands
                                     stage++; break;
                                 case 6:
                                     points = Int32.Parse(e.Message.Text);
-                                    test.questions.Add(new TestQuestion(text, points, variants, columns, answer));
-                                    await Program.bot.SendTextMessageAsync(user.id, "Питання створено.");
-                                    stage = 0;
-                                    callback = null;
-                                    Execute(e); break;
+                                    if (Program.ExecuteMySql($"INSERT INTO Questions (Type, Text, Points, Variants, Answer, Columns) VALUES (1, '{text}', {points}, '{string.Join(";", variants)}', '{answer}', {columns})"))
+                                    {
+                                        TestQuestion q = new TestQuestion(text, points, variants, columns, answer);
+                                        test.questions.Add(q);
+                                        Program.questions.Add(q);
+                                        questions.Add(Program.questions.IndexOf(q) + 1);
+                                        await Program.bot.SendTextMessageAsync(user.id, "Питання створено.");
+                                        stage = 0;
+                                        callback = null;
+                                        Execute(e); break;
+                                    }
+                                    else
+                                    {
+                                        await Program.bot.SendTextMessageAsync(user.id, $"Виникла помилка при внесенні змін у БД. Будь ласка, зверніться до технічного адміністратора!");
+                                        break;
+                                    }
                                 default: break;
                             }
                             break;
@@ -103,11 +115,22 @@ namespace ExamTrainBot.Commands
                                     stage++; break;
                                 case 4:
                                     points = Int32.Parse(e.Message.Text);
-                                    test.questions.Add(new ConformityQuestion(text, points, answer));
-                                    await Program.bot.SendTextMessageAsync(user.id, "Питання створено.");
-                                    stage = 0;
-                                    callback = null;
-                                    Execute(e); break;
+                                    if (Program.ExecuteMySql($"INSERT INTO Questions (Type, Text, Points, Answer) VALUES (3, '{text}', {points}, '{answer}')"))
+                                    {
+                                        ConformityQuestion q = new ConformityQuestion(text, points, answer);
+                                        test.questions.Add(q);
+                                        Program.questions.Add(q);
+                                        questions.Add(Program.questions.IndexOf(q) + 1);
+                                        await Program.bot.SendTextMessageAsync(user.id, "Питання створено.");
+                                        stage = 0;
+                                        callback = null;
+                                        Execute(e); break;
+                                    }
+                                    else
+                                    {
+                                        await Program.bot.SendTextMessageAsync(user.id, $"Виникла помилка при внесенні змін у БД. Будь ласка, зверніться до технічного адміністратора!");
+                                        break;
+                                    }
                                 default: break;
                             }
                             break;
@@ -127,22 +150,41 @@ namespace ExamTrainBot.Commands
                                     stage++; break;
                                 case 4:
                                     points = Int32.Parse(e.Message.Text);
-                                    test.questions.Add(new FreeQuestion(text, points, answer));
-                                    await Program.bot.SendTextMessageAsync(user.id, "Питання створено.");
-                                    stage = 0;
-                                    callback = null;
-                                    Execute(e); break;
+                                    if (Program.ExecuteMySql($"INSERT INTO Questions (Type, Text, Points, Answer) VALUES (2, '{text}', {points}, '{answer}')"))
+                                    {
+                                        FreeQuestion q = new FreeQuestion(text, points, answer);
+                                        test.questions.Add(q);
+                                        Program.questions.Add(q);
+                                        questions.Add(Program.questions.IndexOf(q) + 1);
+                                        await Program.bot.SendTextMessageAsync(user.id, "Питання створено.");
+                                        stage = 0;
+                                        callback = null;
+                                        Execute(e); break;
+                                    }
+                                    else
+                                    {
+                                        await Program.bot.SendTextMessageAsync(user.id, $"Виникла помилка при внесенні змін у БД. Будь ласка, зверніться до технічного адміністратора!");
+                                        break;
+                                    }
                                 default: break;
                             }
                             break;
                         case "Закінчити створення":
                             user.testcreation = false;
                             stage = 0;
-                            Program.testlist.Add(new Test(test));
-                            test = null;
-                            SaveSystem.SaveTests();
-                            await Program.bot.SendTextMessageAsync(user.id, "Ви успішно закінчили створення нового тесту");
-                            break;
+                            if (Program.ExecuteMySql($"INSERT INTO Tests (Rule, Questions) VALUES ('{test.Text}', '{string.Join(';',questions)}')"))
+                            {
+                                Program.testlist.Add(new Test(test));
+                                test = null;
+                                SaveSystem.SaveTests();
+                                await Program.bot.SendTextMessageAsync(user.id, "Ви успішно закінчили створення нового тесту");
+                                break;
+                            }
+                            else
+                            {
+                                await Program.bot.SendTextMessageAsync(user.id, $"Виникла помилка при внесенні змін у БД. Будь ласка, зверніться до технічного адміністратора!");
+                                break;
+                            }
                         default: break;
                     }
                 }

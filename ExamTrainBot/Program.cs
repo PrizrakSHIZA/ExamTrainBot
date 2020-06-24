@@ -111,7 +111,7 @@ namespace ExamTrainBot
             if (users.Find(u => u.id == e.Message.Chat.Id) == null)
             {
                 if (ExecuteMySql($"INSERT INTO Users(ID, Name, Soname) VALUES ({e.Message.Chat.Id}, '{e.Message.Chat.FirstName}', '{e.Message.Chat.LastName}')"))
-                    users.Add(new User(e.Message.Chat.Id, e.Message.Chat.FirstName + " " + e.Message.Chat.LastName, false, false));
+                    users.Add(new User(e.Message.Chat.Id, e.Message.Chat.FirstName + " " + e.Message.Chat.LastName));
                 //SaveSystem.Save();
             }
             //Add user in temp var
@@ -164,6 +164,7 @@ namespace ExamTrainBot
                 //Check if its last question in test
                 if (user.currentquestion >= testlist[User.currenttest].questions.Count)
                 {
+                    ExecuteMySql($"UPDATE Users SET Points = CONCAT(points, '{user.points[^1] + 1};') WHERE ID = {user.id}");
                     user.ontest = false;
                     user.currentquestion = 0;
                     await bot.SendTextMessageAsync(user.id, $"Вітаю! Ви закінчили тест. Ви набрали {user.points[^1]} балів!");
@@ -336,29 +337,43 @@ namespace ExamTrainBot
             }
             else
             {
-                foreach (User u in Program.users)
+                //add test to DB
+                if (ExecuteMySql($"UPDATE Users SET CompletedTests = CONCAT(CompletedTests, '{User.currenttest + 1};') WHERE Admin = 1"))
                 {
-                    if (u.isadmin)
+                    foreach (User u in Program.users)
                     {
-                        //create bool array filled with false value
-                        bool[] tempbool = Enumerable.Repeat(false, testlist[User.currenttest].questions.Count + 1).ToArray();
-                        u.mistakes.Add(tempbool);
-                        u.points.Add(0);
-                        u.completedtests.Add(Program.testlist[User.currenttest]);
-                        u.ontest = true;
-                        u.currentquestion = 0;
-                        await Program.bot.SendTextMessageAsync(u.id, Program.testlist[User.currenttest].Text);
-                        Program.testlist[User.currenttest].questions[0].Ask(u.id);
+                        if (u.isadmin)
+                        {
+                            //create bool array filled with false value
+                            bool[] tempbool = Enumerable.Repeat(false, testlist[User.currenttest].questions.Count + 1).ToArray();
+                            u.mistakes.Add(tempbool);
+                            u.points.Add(0);
+                            u.completedtests.Add(Program.testlist[User.currenttest]);
+                            u.ontest = true;
+                            u.currentquestion = 0;
+                            await Program.bot.SendTextMessageAsync(u.id, Program.testlist[User.currenttest].Text);
+                            Program.testlist[User.currenttest].questions[0].Ask(u.id);
+                        }
+                    }
+                    //timer to 0:00
+                    Timer t = new Timer(new TimerCallback(StopTest));
+                    DateTime temptime = DateTime.Today.AddHours(23).AddMinutes(59);
+
+                    int msUntilTime = (int)((temptime - DateTime.Now).TotalMilliseconds);
+                    t.Change(msUntilTime, Timeout.Infinite);
+
+                    InitializeTimer(TestTime.Hour, TestTime.Minute);
+                }
+                else
+                {
+                    foreach (User u in Program.users)
+                    {
+                        if (u.isadmin)
+                        {
+                            await bot.SendTextMessageAsync(u.id, "Виникла помилка у роботі з базою даних при відправленні тестів. Будь ласка зверніться до техніячного адміністратора!");
+                        } 
                     }
                 }
-                //timer to 0:00
-                Timer t = new Timer(new TimerCallback(StopTest));
-                DateTime temptime = DateTime.Today.AddHours(23).AddMinutes(59);
-
-                int msUntilTime = (int)((temptime - DateTime.Now).TotalMilliseconds);
-                t.Change(msUntilTime, Timeout.Infinite);
-
-                InitializeTimer(TestTime.Hour, TestTime.Minute);
             }
         }
 
@@ -436,7 +451,15 @@ namespace ExamTrainBot
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    users.Add(new User(reader.GetInt32("ID"), reader.GetString("Name") + " " + reader.GetString("Soname"), Convert.ToBoolean(reader.GetUInt32("Subscriber")), Convert.ToBoolean(reader.GetUInt32("Admin"))));
+                    users.Add(new User(
+                        reader.GetInt32("ID"),
+                        reader.GetString("Name") + " " + reader.GetString("Soname"), 
+                        Convert.ToBoolean(reader.GetUInt32("Subscriber")), 
+                        Convert.ToBoolean(reader.GetUInt32("Admin")), 
+                        reader.GetString("Points"),
+                        reader.GetString("CompletedTests"),
+                        reader.GetString("Mistakes")
+                        ));
                 }
                 reader.Close();
 

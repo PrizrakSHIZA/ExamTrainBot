@@ -31,7 +31,8 @@ namespace ExamTrainBot.Commands
                 else
                     text += " s ";
                 text += user.name +" ";
-                text += user.id + "\n";
+                text += user.id + " ";
+                text += user.date.ToString("dd.MM.yyyy") + "\n";
             }
             await Program.bot.SendTextMessageAsync(e.Message.Chat.Id, text, parseMode: ParseMode.Html);
         }
